@@ -1,0 +1,198 @@
+:root {
+    --primary: #3498db;
+    --dark: #2c3e50;
+    --light-bg: #f4f7f6;
+    --border: #ddd;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+h2 {
+    color: var(--dark);
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 10px;
+}
+
+/* Filter Grid Layout */
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+input, select {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.range-inputs {
+    display: flex;
+    gap: 5px;
+}
+
+/* Checkbox Section */
+.checkbox-container {
+    grid-column: 1 / -1;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+}
+
+.checkbox-item {
+    font-weight: normal;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* Advanced Section & Button */
+.advanced-section {
+    grid-column: 1 / -1;
+    padding: 10px 0;
+}
+
+summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+button[type="submit"] {
+    grid-column: 1 / -1;
+    background-color: var(--primary);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+/* Results & Table */
+.stats-banner {
+    margin-top: 30px;
+    padding: 15px;
+    background: #e8f4fd;
+    border-left: 5px solid var(--primary);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th {
+    background-color: var(--dark);
+    color: white;
+    text-align: left;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Constrain the range-inputs container */
+.range-inputs {
+    display: flex;
+    gap: 8px;
+    width: 100%; /* Keep it within the parent .filter-group */
+}
+
+/* Force the min/max inputs to share space equally */
+.range-inputs input {
+    width: 0; /* Important: allows flex-grow to work without "spilling" */
+    flex: 1;
+    min-width: 0; /* Prevents intrinsic width from pushing out */
+    padding: 10px 5px; /* Slight padding reduction for small boxes */
+}
+
+/* Ensure all filter groups respect the grid cell */
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Safety clip */
+}
+
+/* Apply the grid layout to the content inside the advanced section */
+.advanced-section {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+/* This targets the container inside details once it expands */
+.advanced-section[open] {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* Ensure the summary (the clickable text) always stays full width */
+.advanced-section summary {
+    grid-column: 1 / -1;
+    margin-bottom: 15px;
+    outline: none;
+}
+
+/* Apply the range-input fix specifically to the Tomteareal inputs */
+.advanced-section .range-inputs input {
+    width: 0;
+    flex: 1;
+    min-width: 0;
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leiepris data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_rev2.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>Finn din utleiepris</h2>
+    <p>Fyll inn de parameterene som er relevant for din utleiebolig og finn tilsvarende boliger som har blitt lagt ut til utleie på finn.no.</p>
+    <form method="POST">
+        <div class="filter-grid">
+            <div class="checkbox-container">
+                <label>
+                Boligtype
+                </label>
+                <div class="checkbox-grid">
+                    {% set typer = [
+                        'Leilighet', 'Rekkehus', 'Tomannsbolig', 
+                        'Enebolig', 'Rom i bofellesskap', 'Hybel', 
+                        'Garasje/Parkering', 'Andre'
+                    ] %}
+                    
+                    {% for type in typer %}
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="Boligtype" value="{{ type }}" 
+                            {% if type in form.getlist('Boligtype') %}checked{% endif %}> 
+                        {{ type }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Antall Soverom</label>
+                <input type="number" name="AntallSoverom" value="{{ form.get('AntallSoverom','') }}">
+            </div>
+
+            <div class="filter-group">
+                <label>Areal (kvm)</label>
+                <div class="range-inputs">
+                    <input type="number" name="ArealPrimerrom_min" placeholder="Min" value="{{ form.get('ArealPrimerrom_min','') }}">
+                    <input type="number" name="ArealPrimerrom_max" placeholder="Max" value="{{ form.get('ArealPrimerrom_max','') }}">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Parkering</label>
+                <select name="Parkering">
+                    <option value="Nei" {% if form.get('Parkering') == 'Nei' %}selected{% endif %}>Nei</option>                    
+                    <option value="Ja" {% if form.get('Parkering') == 'Ja' %}selected{% endif %}>Ja</option>
+                    <option value="Begge" {% if form.get('Parkering') == 'Begge' %}selected{% endif %}>Ja</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Balkong</label>
+                <select name="Balkong">
+                    <option value="Nei" {% if form.get('Balkong') == 'Nei' %}selected{% endif %}>Nei</option>                    
+                    <option value="Ja" {% if form.get('Balkong') == 'Ja' %}selected{% endif %}>Ja</option>
+                    <option value="Begge" {% if form.get('Balkong') == 'Begge' %}selected{% endif %}>Ja</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Postnummer</label>
+                <input type="text" name="Postnummer" value="{{ form.get('Postnummer','') }}">
+            </div>
+
+            <div class="filter-group">
+                <label>Poststed</label>
+                <input type="text" name="Poststed" value="{{ form.get('Poststed','') }}">
+            </div>
+
+            <div class="filter-group">
+                <label>Status</label>
+                <select name="status_filter">
+                    <option value="Alle">Vis alle</option>
+                    <option value="Utleid" {% if form.get('status_filter') == 'Utleid' %}selected{% endif %}>Kun utleide</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Sist endret (Fra - Til)</label>
+                <div class="range-inputs">
+                    <input type="date" name="SistEndretDT_min" value="{{ form.get('SistEndretDT_min','') }}">
+                    <input type="date" name="SistEndretDT_max" value="{{ form.get('SistEndretDT_max','') }}">
+                </div>
+            </div>
+
+            <details class="advanced-section">
+                <summary>Flere parametere</summary>
+
+                <div class="filter-group">
+                    <label>Etasje</label>
+                    <input type="text" name="Etasje" value="{{ form.get('Etasje','') }}">
+                </div>
+
+                <div class="filter-group">
+                    <label>Energimerke</label>
+                    <input type="text" name="Energimerke" value="{{ form.get('Energimerke','') }}">
+                </div>
+
+                <div class="filter-group">
+                    <label>Antall Rom</label>
+                    <input type="number" name="AntallRom" value="{{ form.get('AntallRom','') }}">
+                </div>
+
+                <div class="filter-group">
+                    <label>Tomteareal (Min - Max)</label>
+                    <div class="range-inputs">
+                        <input type="number" name="Tomteareal_min" placeholder="Min" value="{{ form.get('Tomteareal_min','') }}">
+                        <input type="number" name="Tomteareal_max" placeholder="Max" value="{{ form.get('Tomteareal_max','') }}">
+                    </div>
+                </div>
+
+            </details>
+
+            <button type="submit">Finn tilsvarende utleieannonser og leiepris</button>
+        </div>
+    </form>
+
+    {% if results %}
+    <div class="stats-banner">
+        <strong>Annonser funnet:</strong> {{ results|length }} | 
+        <strong>Gjennomsnittlig leiepris:</strong> {{ "{:,.0f}".format(avg_rent) }} NOK
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Adresse</th>
+                    <th>Type</th>
+                    <th>Leiepris</th>
+                    <th>Soverom</th>
+                    <th>P-Rom</th>
+                    <th>Rom</th>
+                    <th>Etasje</th>
+                    <th>Energi</th>
+                    <th>Parkering</th>
+                    <th>Balkong</th>
+                    <th>Tomt</th>
+                    <th>Poststed</th>
+                    <th>Status</th>
+                    <th>Link</th>
+                    <th>Sist endret</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                <tr>
+                    <td>{{ row.Adresse }}</td>
+                    <td>{{ row.Boligtype }}</td>
+                    <td><strong>{{ row.Leiepris }}</strong></td>
+                    <td>{{ row.AntallSoverom }}</td>
+                    <td>{{ row.ArealPrimerrom }}</td>
+                    <td>{{ row.AntallRom }}</td>
+                    <td>{{ row.Etasje }}</td>
+                    <td>{{ row.Energimerke }}</td>
+                    <td>{{ row.Parkering }}</td>
+                    <td>{{ row.Balkong }}</td>
+                    <td>{{ row.Tomteareal }}</td>
+                    <td>{{ row.Poststed }} ({{ row.Postnummer }})</td>
+                    <td>{{ 'Utleid' if row.UtleidMerke else 'Ukjent' }}</td>
+                    <td><a href="{{ row.Link }}" target="_blank">Finn</a></td>
+                    <td>{{ row.SistEndretDT.strftime('%d.%m.%Y %H:%M') if row.SistEndretDT else '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
