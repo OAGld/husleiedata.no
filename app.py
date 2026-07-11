@@ -10,20 +10,20 @@ db_config = {
     'database': 'utleiedata'
 }
 
+
 def get_db_connection():
     return mysql.connector.connect(**db_config)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     results = []
     avg_rent = 0
     # Use request.form directly so we can use .getlist() in the template
-    form = request.form 
-    
+    form = request.form
     if request.method == 'POST':
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
         query = "SELECT * FROM data WHERE 1=1"
         params = []
 
@@ -43,9 +43,16 @@ def index():
                 params.append(f"%{val}%")
 
         # --- EXACT FILTERS ---
-        for field in ['AntallSoverom', 'AntallRom', 'Parkering', 'Balkong']:
+        for field in ['AntallSoverom', 'AntallRom']:
             val = request.form.get(field)
             if val and val.strip():
+                query += f" AND {field} = %s"
+                params.append(val)
+
+        # --- PARKERING / BALKONG: "Begge" means "don't filter" ---
+        for field in ['Parkering', 'Balkong']:
+            val = request.form.get(field)
+            if val and val.strip() and val != 'Begge':
                 query += f" AND {field} = %s"
                 params.append(val)
 
@@ -79,7 +86,8 @@ def index():
 
         cursor.execute(query, params)
         results = cursor.fetchall()
-        
+
+        print(query)
         if results:
             total_rent = sum(row['Leiepris'] for row in results if row['Leiepris'])
             avg_rent = total_rent / len(results)
@@ -88,6 +96,7 @@ def index():
         conn.close()
 
     return render_template('index.html', results=results, form=form, avg_rent=avg_rent)
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
