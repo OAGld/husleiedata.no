@@ -124,9 +124,12 @@
 
     {% if results %}
     <div class="stats-banner">
-        <strong>Annonser funnet:</strong> {{ results|length }} | 
+        <strong>Annonser funnet:</strong> {{ results|length }}{% if truncated %}+{% endif %} | 
         <strong>Gjennomsnittlig leiepris:</strong> {{ "{:,.0f}".format(avg_rent) }} NOK
     </div>
+    {% if truncated %}
+    <p class="truncated-note">Viser de {{ max_results }} sist endrede annonsene som matcher søket. Snevre inn søket for å se alle treff.</p>
+    {% endif %}
 
     <div class="table-wrapper">
         <table>

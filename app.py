@@ -19,6 +19,7 @@ def get_db_connection():
 def index():
     results = []
     avg_rent = 0
+    MAX_RESULTS = 500
     # Use request.form directly so we can use .getlist() in the template
     form = request.form
     if request.method == 'POST':
@@ -84,6 +85,9 @@ def index():
             query += " AND SistEndretDT <= %s"
             params.append(date_to + " 23:59:59")  # Include the entire end date
 
+        query += " ORDER BY SistEndretDT DESC LIMIT %s"
+        params.append(MAX_RESULTS)
+
         cursor.execute(query, params)
         results = cursor.fetchall()
 
@@ -95,7 +99,8 @@ def index():
         cursor.close()
         conn.close()
 
-    return render_template('index.html', results=results, form=form, avg_rent=avg_rent)
+    truncated = len(results) == MAX_RESULTS if request.method == 'POST' else False
+    return render_template('index.html', results=results, form=form, avg_rent=avg_rent, truncated=truncated, max_results=MAX_RESULTS)
 
 
 if __name__ == '__main__':
